@@ -21,7 +21,7 @@ def png2gif(flist, outname):
         outname: str
             Output file name.
     """
-    with imageio.get_writer(outname, mode='I') as writer:  # Image streamer
+    with imageio.get_writer(outname, mode='I', duration=0.3) as writer:  # Image streamer
         for infile in flist:
             image = imageio.imread(infile)
             writer.append_data(image)
