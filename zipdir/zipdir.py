@@ -84,13 +84,13 @@ if __name__ == '__main__':
     parser.add_argument('-i',
         '--indir',
         dest='indir',
-        default="/g/data2/rr5/arm/data/big_data/access_c2/",
+        default="/g/data2/rr5/arm/data/CPOL_data/cpol_sur_vols",
         type=str,
         help='Input directory.')
     parser.add_argument('-o',
         '--output',
         dest='outdir',
-        default="/g/data2/rr5/arm/data/big_data/access_c2/",
+        default="/g/data2/rr5/arm/data/CPOL_data/cpol_sur_vols",
         type=str,
         help='Output directory.')
 
