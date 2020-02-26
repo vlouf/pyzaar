@@ -106,4 +106,5 @@ venv.bak/
 # PBS files
 *.pbs
 *.pbs.*
+.vscode
 .vscode/settings.json
