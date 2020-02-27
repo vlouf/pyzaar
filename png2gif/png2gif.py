@@ -21,7 +21,9 @@ def png2gif(flist, outname):
         outname: str
             Output file name.
     """
-    with imageio.get_writer(outname, mode='I', duration=0.3) as writer:  # Image streamer
+    with imageio.get_writer(
+        outname, mode="I", duration=0.3
+    ) as writer:  # Image streamer
         for infile in flist:
             image = imageio.imread(infile)
             writer.append_data(image)
@@ -48,22 +50,21 @@ def main():
     return None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser_description = "A script to transform a directory of pngs into a gif."
 
     parser = argparse.ArgumentParser(description=parser_description)
-    parser.add_argument('-i',
-        '--indir',
-        dest='indir',
+    parser.add_argument(
+        "-i", "--indir", dest="indir", type=str, help="Input directory.", required=True
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="outfilename",
         type=str,
-        help='Input directory.',
-        required=True)
-    parser.add_argument('-o',
-        '--output',
-        dest='outfilename',
-        type=str,
-        help='Output file.',
-        required=True)
+        help="Output file.",
+        required=True,
+    )
 
     args = parser.parse_args()
     OUTPUT_FILE = args.outfilename

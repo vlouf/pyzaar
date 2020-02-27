@@ -23,8 +23,8 @@ def nczip(infile):
     outfilename = os.path.join(OUTPUT_DIR, outfilename)
 
     args = dict()
-    for k, _ in (data.items()):
-        args[k] = {'zlib': True}
+    for k, _ in data.items():
+        args[k] = {"zlib": True}
 
     data.to_netcdf(outfilename, encoding=args)
     return None
@@ -56,23 +56,26 @@ def main():
     return None
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser_description = "A script to re-encode and compress netcdf file(s)."
 
     parser = argparse.ArgumentParser(description=parser_description)
-    parser.add_argument('-i',
-        '--indir',
-        dest='indir',
+    parser.add_argument(
+        "-i",
+        "--indir",
+        dest="indir",
         type=str,
-        help='Input netcdf file or directory to (re)compress.',
-        required=True)
-    parser.add_argument('-o',
-        '--output',
-        dest='outdir',
+        help="Input netcdf file or directory to (re)compress.",
+        required=True,
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="outdir",
         type=str,
-        help='Output directory.',
-        required=True)
+        help="Output directory.",
+        required=True,
+    )
 
     args = parser.parse_args()
     OUTPUT_DIR = args.outdir

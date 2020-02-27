@@ -39,30 +39,30 @@ def process_directory(date):
         date: str
             A given date of the form YYYYMMDD
     """
-    indir = os.path.join(INPUT_DIR, str(date.year), date.strftime('%Y%m%d'))
+    indir = os.path.join(INPUT_DIR, str(date.year), date.strftime("%Y%m%d"))
     outdir = os.path.join(OUTPUT_DIR, str(date.year))
     try:
         os.mkdir(outdir)
     except FileExistsError:
         pass
-    outfile = os.path.join(OUTPUT_DIR, str(date.year), date.strftime('%Y%m%d') + '.zip')
+    outfile = os.path.join(OUTPUT_DIR, str(date.year), date.strftime("%Y%m%d") + ".zip")
     if not os.path.exists(indir):
-        print(f'Input directory {indir} does not exist.')
+        print(f"Input directory {indir} does not exist.")
         return None
     if os.path.isfile(outfile):
-        print('Zip file already exists.')
+        print("Zip file already exists.")
         return None
 
-    print(f'Input directory is {indir} and output zip file is {outfile}.')
+    print(f"Input directory is {indir} and output zip file is {outfile}.")
 
-    with zipfile.ZipFile(outfile, 'w', zipfile.ZIP_DEFLATED) as zid:
+    with zipfile.ZipFile(outfile, "w", zipfile.ZIP_DEFLATED) as zid:
         zipdir(indir, zid)
     return None
 
 
 def main():
     dtime = pd.date_range(START_DATE, END_DATE)
-#     datestr = [d.strftime('%Y%m%d') for d in dtime]
+    #     datestr = [d.strftime('%Y%m%d') for d in dtime]
 
     bag = db.from_sequence(dtime).map(process_directory)
     bag.compute()
@@ -70,34 +70,42 @@ def main():
     return None
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser_description = "A script to zip directories using multiprocessing."
 
     parser = argparse.ArgumentParser(description=parser_description)
-    parser.add_argument('-s',
-        '--start-date',
-        dest='start_date',
-        default='20141114',
+    parser.add_argument(
+        "-s",
+        "--start-date",
+        dest="start_date",
+        default="20141114",
         type=str,
-        help='Starting date.')
-    parser.add_argument('-e',
-        '--end-date',
-        dest='end_date',
-        default='20150430',
+        help="Starting date.",
+    )
+    parser.add_argument(
+        "-e",
+        "--end-date",
+        dest="end_date",
+        default="20150430",
         type=str,
-        help='Ending date.')
-    parser.add_argument('-i',
-        '--indir',
-        dest='indir',
+        help="Ending date.",
+    )
+    parser.add_argument(
+        "-i",
+        "--indir",
+        dest="indir",
         default="/g/data2/rr5/CPOL_radar/CPOL_level_1b/GRIDDED/GRID_70km_1000m/",
         type=str,
-        help='Input directory.')
-    parser.add_argument('-o',
-        '--output',
-        dest='outdir',
+        help="Input directory.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="outdir",
         default="/g/data/hj10/cpol_level_1b/v2018/gridded/grid_70km_1000m/",
         type=str,
-        help='Output directory.')
+        help="Output directory.",
+    )
 
     args = parser.parse_args()
     START_DATE = args.start_date
