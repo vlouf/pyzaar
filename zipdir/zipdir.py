@@ -39,8 +39,13 @@ def process_directory(date):
         date: str
             A given date of the form YYYYMMDD
     """
-    indir = os.path.join(INPUT_DIR, date)
-    outfile = os.path.join(OUTPUT_DIR, date + '.zip')
+    indir = os.path.join(INPUT_DIR, str(date.year), date.strftime('%Y%m%d'))
+    outdir = os.path.join(OUTPUT_DIR, str(date.year))
+    try:
+        os.mkdir(outdir)
+    except FileExistsError:
+        pass
+    outfile = os.path.join(OUTPUT_DIR, str(date.year), date.strftime('%Y%m%d') + '.zip')
     if not os.path.exists(indir):
         print(f'Input directory {indir} does not exist.')
         return None
@@ -57,9 +62,9 @@ def process_directory(date):
 
 def main():
     dtime = pd.date_range(START_DATE, END_DATE)
-    datestr = [d.strftime('%Y%m%d') for d in dtime]
+#     datestr = [d.strftime('%Y%m%d') for d in dtime]
 
-    bag = db.from_sequence(datestr).map(process_directory)
+    bag = db.from_sequence(dtime).map(process_directory)
     bag.compute()
 
     return None
@@ -84,13 +89,13 @@ if __name__ == '__main__':
     parser.add_argument('-i',
         '--indir',
         dest='indir',
-        default="/g/data2/rr5/arm/data/CPOL_data/cpol_sur_vols",
+        default="/g/data2/rr5/CPOL_radar/CPOL_level_1b/GRIDDED/GRID_70km_1000m/",
         type=str,
         help='Input directory.')
     parser.add_argument('-o',
         '--output',
         dest='outdir',
-        default="/g/data2/rr5/arm/data/CPOL_data/cpol_sur_vols",
+        default="/g/data/hj10/cpol_level_1b/v2018/gridded/grid_70km_1000m/",
         type=str,
         help='Output directory.')
 
