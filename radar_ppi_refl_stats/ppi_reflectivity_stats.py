@@ -91,13 +91,14 @@ def process_year(year):
 
     if DR == 350:
         nr = 429
-        rmaskv = np.arange(150, 150e3, 350).astype(np.int32)
+        da = 1.5
     else:
         nr = 600
-        rmaskv = np.arange(150, 150e3, 250).astype(np.int32)
+        da = 1
 
+    amaskv = np.arange(0, 360, da)
+    rmaskv = np.arange(150, 150e3, DR).astype(np.int32)
     unit = np.zeros((NA, nr, 3, 3), dtype=np.int8)
-    amaskv = np.arange(0, NA, 1.5)
 
     for r in rslt:
         unit += r
