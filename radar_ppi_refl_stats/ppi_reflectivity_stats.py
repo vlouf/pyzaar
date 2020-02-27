@@ -47,16 +47,16 @@ def stats_refl(infile):
         unit = np.zeros((NA, nr, 3, 3), dtype=np.int8)
 
         r = radar.range["data"]
-        dr = DR
         for i in range(3):  # Elevation
             for j in range(3):  # Refl thrshld
                 zthresh = 40 + j * 10
                 sl = radar.get_slice(i)
                 refl = radar.fields["DBZ"]["data"][sl]
                 azi = radar.azimuth["data"][sl]
-                apos, rpos = np.where(refl > zthresh)
+                R, A = np.meshgrid(r, azi)
+                apos, rpos = np.where((refl > zthresh) & (R < 150e3))
                 adx = np.round((azi[apos] - azi.min()) / da).astype(int) % NA
-                rdx = ((r[rpos] - r[0]) / dr).astype(int)
+                rdx = ((r[rpos] - r[0]) / DR).astype(int)
                 unit[adx, rdx, i, j] += 1
         del radar
     except Exception:
