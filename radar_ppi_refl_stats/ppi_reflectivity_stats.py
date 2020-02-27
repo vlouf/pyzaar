@@ -1,3 +1,12 @@
+"""
+Compute the spatial statistics of reflectivity for a whole year. Ideal to find
+the clutter position.
+
+@title: ppi_reflectivity_stats
+@author: Valentin Louf <valentin.louf@bom.gov.au>
+@institutions: Monash University and the Australian Bureau of Meteorology
+@date: 27/02/2020
+"""
 import gc
 import os
 import glob
@@ -12,6 +21,20 @@ import dask.bag as db
 
 
 def stats_refl(infile):
+    '''
+    Open the radar file and count the stats for 3 elevations and 3 reflectivity
+    thresholds.
+
+    Parameters:
+    ===========
+    infile: str
+        Input radar file (CF/Radials).
+
+    Returns:
+    ========
+    unit: ndarray<na, nr, 3, 3> int8
+        Stats for 3 elevations and 3 reflectivity thresholds.
+    '''
     try:
         radar = pyart.io.read_cfradial(infile, include_fields=['DBZ'])
         if DR == 350:
@@ -37,6 +60,7 @@ def stats_refl(infile):
                 unit[adx, rdx, i, j] += 1
         del radar
     except Exception:
+        print(f'ERROR with file {infile}')
         traceback.print_exc()
         unit = None
 
@@ -45,7 +69,12 @@ def stats_refl(infile):
 
 def process_year(year):
     '''
-    Compute reflectivity spatial statistics for a given year. The output grid
+    Compute reflectivity spatial statistics for a given year.
+
+    Parameters:
+    ===========
+    year: int
+        Year given from argument parser.
     '''
     outfilename = os.path.join(OUTDIR, f'zthresholds_{year}.nc')
     flist = sorted(glob.glob(os.path.join(INDIR, f'{year}/**/*.nc')))
@@ -101,6 +130,9 @@ def process_year(year):
 
 
 def main():
+    '''
+    Buffer function to catch error and collect garbage.
+    '''
     try:
         process_year(YEAR)
         gc.collect()
