@@ -2,6 +2,7 @@ import gc
 import os
 import glob
 import warnings
+import argparse
 import traceback
 
 import pyart
@@ -37,7 +38,7 @@ def stats_refl(infile):
 def process_year(year):
     if year == 2009 or year == 2008:
         return None
-    flist = sorted(glob.glob(f'/g/data/hj10/admin/cpol_level_1a/v2019/ppi/{year}/**/*.nc'))
+    flist = sorted(glob.glob(os.path.join(INDIR, f'{year}/**/*.nc')))
     if len(flist) == 0:
         return None
     if os.path.isfile(f'zthresholds_{year}.nc'):
@@ -74,7 +75,7 @@ def process_year(year):
     dset.zstats_elev2.attrs = {'units': '1', 'description': 'Count volumes with reflectivity above threshold'}
 
     dset.attrs['total'] = len(flist)
-    dset.to_netcdf(f'zthresholds_{year}.nc')
+    dset.to_netcdf(os.path.join(OUTDIR, f'zthresholds_{year}.nc'))
 
     del rslt
 
@@ -92,6 +93,34 @@ def main():
 
 
 if __name__ == "__main__":
-    YEAR = 2006
+    parser_description = "Compute statistics of radar PPI reflectivity."
+    parser = argparse.ArgumentParser(description=parser_description)
+
+    parser.add_argument('-y',
+                        '--year',
+                        type=int,
+                        dest='year',
+                        help='Year to process.',
+                        required=True)
+    parser.add_argument('-i',
+                        '--input-dir',
+                        type=str,
+                        dest='indir',
+                        help='Input directory.',
+                        default='/g/data/hj10/admin/cpol_level_1a/v2019/ppi/',
+                        required=False)
+    parser.add_argument('-o',
+                        '--output-dir',
+                        type=str,
+                        dest='outdir',
+                        help='Output directory.',
+                        default=os.path.expanduser('~'),
+                        required=False)
+
+    args = parser.parse_args()
+    YEAR = args.year
+    INDIR = args.indir
+    OUTDIR = args.outdir
+
     warnings.simplefilter('ignore')
     main()
