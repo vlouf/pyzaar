@@ -15,9 +15,11 @@ def stats_refl(infile):
     try:
         radar = pyart.io.read_cfradial(infile, include_fields=['DBZ'])
         if DR == 350:
-            nr = 500
+            nr = 429
+            da = 1.5
         else:
             nr = 600
+            da = 1
 
         unit = np.zeros((NA, nr, 3, 3), dtype=np.int8)
 
@@ -30,7 +32,7 @@ def stats_refl(infile):
                 refl = radar.fields['DBZ']['data'][sl]
                 azi = radar.azimuth['data'][sl]
                 apos, rpos = np.where(refl > zthresh)
-                adx = np.round((azi[apos] - azi.min()) / 1.5).astype(int) % 240
+                adx = np.round((azi[apos] - azi.min()) / da).astype(int) % NA
                 rdx = ((r[rpos] - r[0]) / dr).astype(int)
                 unit[adx, rdx, i, j] += 1
         del radar
@@ -59,14 +61,14 @@ def process_year(year):
     rslt = [r for r in rslt if r is not None]
 
     if DR == 350:
-        nr = 500
-        rmaskv = np.arange(150, 150e3, 300).astype(np.int32)
+        nr = 429
+        rmaskv = np.arange(150, 150e3, 350).astype(np.int32)
     else:
         nr = 600
         rmaskv = np.arange(150, 150e3, 250).astype(np.int32)
 
     unit = np.zeros((NA, nr, 3, 3), dtype=np.int8)
-    amaskv = np.arange(0, 360, 1.5)
+    amaskv = np.arange(0, NA, 1.5)
 
     for r in rslt:
         unit += r
@@ -140,7 +142,7 @@ if __name__ == "__main__":
 
     if YEAR < 2008:
         NA = 240
-        DR = 300
+        DR = 350
     else:
         NA = 360
         DR = 250
