@@ -14,10 +14,15 @@ import dask.bag as db
 def stats_refl(infile):
     try:
         radar = pyart.io.read_cfradial(infile, include_fields=['DBZ'])
-        unit = np.zeros((240, 500, 3, 3), dtype=np.int8)
+        if DR == 350:
+            nr = 500
+        else:
+            nr = 600
+
+        unit = np.zeros((NA, nr, 3, 3), dtype=np.int8)
 
         r = radar.range['data']
-        dr = 300
+        dr = DR
         for i in range(3):  # Elevation
             for j in range(3):  # Refl thrshld
                 zthresh = 40 + j * 10
@@ -37,20 +42,30 @@ def stats_refl(infile):
 
 
 def process_year(year):
-    if year == 2009 or year == 2008:
-        return None
+    '''
+    Compute reflectivity spatial statistics for a given year. The output grid
+    '''
+    outfilename = os.path.join(OUTDIR, f'zthresholds_{year}.nc')
     flist = sorted(glob.glob(os.path.join(INDIR, f'{year}/**/*.nc')))
     if len(flist) == 0:
+        print('No file found.')
         return None
-    if os.path.isfile(f'zthresholds_{year}.nc'):
+    if os.path.isfile(outfilename):
+        print('Output file already exists.')
         return None
 
     bag = db.from_sequence(flist).map(stats_refl)
     rslt = bag.compute()
     rslt = [r for r in rslt if r is not None]
 
-    unit = np.zeros((240, 500, 3, 3), dtype=np.int64)
-    rmaskv = np.arange(150, 150e3, 300).astype(np.int32)
+    if DR == 350:
+        nr = 500
+        rmaskv = np.arange(150, 150e3, 300).astype(np.int32)
+    else:
+        nr = 600
+        rmaskv = np.arange(150, 150e3, 250).astype(np.int32)
+
+    unit = np.zeros((NA, nr, 3, 3), dtype=np.int8)
     amaskv = np.arange(0, 360, 1.5)
 
     for r in rslt:
@@ -76,7 +91,7 @@ def process_year(year):
     dset.zstats_elev2.attrs = {'units': '1', 'description': 'Count volumes with reflectivity above threshold'}
 
     dset.attrs['total'] = len(flist)
-    dset.to_netcdf(os.path.join(OUTDIR, f'zthresholds_{year}.nc'))
+    dset.to_netcdf(outfilename)
 
     del rslt
 
@@ -122,6 +137,13 @@ if __name__ == "__main__":
     YEAR = args.year
     INDIR = args.indir
     OUTDIR = args.outdir
+
+    if YEAR < 2008:
+        NA = 240
+        DR = 300
+    else:
+        NA = 360
+        DR = 250
 
     warnings.simplefilter('ignore')
     main()
