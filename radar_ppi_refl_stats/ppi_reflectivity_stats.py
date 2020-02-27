@@ -30,6 +30,7 @@ def stats_refl(infile):
                 unit[adx, rdx, i, j] += 1
         del radar
     except Exception:
+        traceback.print_exc()
         unit = None
 
     return unit
