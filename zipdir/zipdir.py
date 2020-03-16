@@ -11,7 +11,7 @@ import dask.bag as db
 import pandas as pd
 
 
-def zipdir(path, ziph):
+def zipdir(path):
     """
     Zip all files and subdirectories from a given directory.
 
@@ -22,9 +22,30 @@ def zipdir(path, ziph):
         ziph: ZipFile
             Zip file handle.
     """
-    for root, _, files in os.walk(path):
-        for file in files:
-            ziph.write(os.path.join(root, file))
+    path = path[:-1]
+    print(f'zipping {path}')
+
+    #build paths
+    path_split = path.split('/')
+    folder_name = path_split[-1]
+    path_split.pop(-1)
+    cd_path = '/'.join(path_split)
+    zip_fname = folder_name + '.zip'
+    zip_ffn = cd_path + '/' + zip_fname
+    print(zip_ffn)
+    #skip zipping if already exists
+    if os.path.isfile(zip_ffn):
+        print('zip file already exists')
+    else:
+        cmd = ' '.join([zip_cmd, zip_ffn, path])
+        os.system(cmd)
+    #if zip file has been created, remove tar
+    if os.path.isfile(zip_ffn):
+        cmd = 'rm -rf ' + path
+        os.system(cmd)
+    else:
+        print('failed to compress:',path)
+
     return None
 
 
